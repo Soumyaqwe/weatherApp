@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beautiful Weather App</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:
+      linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+      url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop");
+      background-size:cover;
+      background-position:center;
+      overflow:hidden;
+    }
+
+    .container{
+      width:380px;
+      padding:30px;
+      border-radius:25px;
+      backdrop-filter: blur(18px);
+      background: rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.3);
+      box-shadow:0 8px 32px rgba(0,0,0,0.35);
+      color:white;
+      text-align:center;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn{
+      from{
+        opacity:0;
+        transform:translateY(30px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    h1{
+      margin-bottom:25px;
+      font-size:32px;
+      font-weight:700;
+      letter-spacing:1px;
+    }
+
+    .search-box{
+      display:flex;
+      gap:12px;
+      margin-bottom:25px;
+    }
+
+    input{
+      flex:1;
+      padding:14px 18px;
+      border:none;
+      border-radius:50px;
+      outline:none;
+      font-size:16px;
+      background:rgba(255,255,255,0.2);
+      color:white;
+      backdrop-filter: blur(5px);
+    }
+
+    input::placeholder{
+      color:#eee;
+    }
+
+    button{
+      border:none;
+      padding:14px 18px;
+      border-radius:50%;
+      cursor:pointer;
+      background:white;
+      color:#333;
+      font-size:18px;
+      transition:0.3s;
+      box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    button:hover{
+      transform:scale(1.1);
+      background:#00d4ff;
+      color:white;
+    }
+
+    .weather-info img{
+      width:120px;
+      margin-top:10px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float{
+      0%{
+        transform:translateY(0px);
+      }
+      50%{
+        transform:translateY(-10px);
+      }
+      100%{
+        transform:translateY(0px);
+      }
+    }
+
+    .temp{
+      font-size:65px;
+      font-weight:700;
+      margin:10px 0;
+      text-shadow:2px 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .city{
+      font-size:30px;
+      font-weight:600;
+      margin-bottom:8px;
+    }
+
+    .condition{
+      font-size:18px;
+      color:#f1f1f1;
+      margin-bottom:25px;
+    }
+
+    .details{
+      display:flex;
+      justify-content:space-between;
+      gap:15px;
+      margin-top:20px;
+    }
+
+    .card{
+      flex:1;
+      background:rgba(255,255,255,0.18);
+      padding:18px;
+      border-radius:18px;
+      backdrop-filter: blur(5px);
+      transition:0.3s;
+    }
+
+    .card:hover{
+      transform:translateY(-5px);
+      background:rgba(255,255,255,0.25);
+    }
+
+    .card h3{
+      font-size:24px;
+      margin-bottom:5px;
+    }
+
+    .card p{
+      font-size:14px;
+      color:#f1f1f1;
+    }
+
+    .error{
+      color:#ffb3b3;
+      margin-top:10px;
+    }
+
+    @media(max-width:420px){
+
+      .container{
+        width:90%;
+        padding:25px;
+      }
+
+      .temp{
+        font-size:55px;
+      }
+
+      .city{
+        font-size:24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>🌦 Weather App</h1>
+
+    <div class="search-box">
+      <input type="text" id="cityInput" placeholder="Enter city name">
+      <button onclick="getWeather()">🔍</button>
+    </div>
+
+    <div class="weather-info" id="weatherInfo"></div>
+
+  </div>
+
+  <script>
+
+    const apiKey = "29330e32a8ba4cdba4d130500261205";
+
+    async function getWeather(){
+
+      const city = document.getElementById("cityInput").value;
+
+      if(city === ""){
+        alert("Please enter city name");
+        return;
+      }
+
+      const url =
+      `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`;
+
+      try{
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if(data.error){
+
+          document.getElementById("weatherInfo").innerHTML =
+          `<p class="error">${data.error.message}</p>`;
+
+          return;
+        }
+
+        document.getElementById("weatherInfo").innerHTML = `
+
+          <img src="https:${data.current.condition.icon}" alt="weather">
+
+          <div class="temp">
+            ${data.current.temp_c}°C
+          </div>
+
+          <div class="city">
+            ${data.location.name}
+          </div>
+
+          <div class="condition">
+            ${data.current.condition.text}
+          </div>
+
+          <div class="details">
+
+            <div class="card">
+              <h3>${data.current.humidity}%</h3>
+              <p>Humidity</p>
+            </div>
+
+            <div class="card">
+              <h3>${data.current.wind_kph}</h3>
+              <p>Wind kph</p>
+            </div>
+
+            <div class="card">
+              <h3>${data.current.feelslike_c}°</h3>
+              <p>Feels Like</p>
+            </div>
+
+          </div>
+        `;
+
+      }
+      catch(error){
+        console.log(error);
+      }
+    }
+
+    window.onload = () => {
+
+      document.getElementById("cityInput").value = "London";
+      getWeather();
+
+    };
+
+  </script>
+
+</body>
+</html>
